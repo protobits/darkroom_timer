@@ -13,4 +13,7 @@ void lcd_draw_milliseconds(uint32_t t);
 void lcd_init(void);
 void lcd_render(void);
 
+uint8_t lcd_get_brightness(void);
+void lcd_set_brightness(uint8_t val);
+
 #endif /* __LCD_H__ */

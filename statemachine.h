@@ -21,6 +21,9 @@ typedef enum
   STATE_STRIP_COUNTDOWN,
   STATE_STRIP_WAITING,
 
+  STATE_SET_MENU,
+  STATE_SET_BRIGHTNESS_MENU
+
   /* TODO:
    * - settings (brightness, delay)
    * - mem save/load

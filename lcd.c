@@ -3,6 +3,8 @@
 #include "gpio.h"
 #include "input.h"
 
+#define MIN_BRIGHTNESS 0xF
+
 /* segment bit encoding is [ 0 <A> .. <G> ] */
 
 static const uint8_t numeric_segments[] =
@@ -97,12 +99,15 @@ void lcd_render(void)
     switch (current_digit)
     {
         case 0:
+            PWMA_SetPinOutputState(PWM_Pin_3N, HAL_State_OFF);
             GPIO_D3 = 1;
             break;
         case 1:
+            PWMA_SetPinOutputState(PWM_Pin_4, HAL_State_OFF);
             GPIO_D1 = 1;
             break;
         case 2:
+            PWMA_SetPinOutputState(PWM_Pin_3, HAL_State_OFF);
             GPIO_D2 = 1;
             break;
     }
@@ -121,13 +126,16 @@ void lcd_render(void)
     switch (current_digit)
     {
         case 0:
-            GPIO_D1 = 0;
+            PWMA_SetPinOutputState(PWM_Pin_4, HAL_State_ON);
+            //GPIO_D1 = 0;
             break;
         case 1:
-            GPIO_D2 = 0;
+            PWMA_SetPinOutputState(PWM_Pin_3, HAL_State_ON);
+            //GPIO_D2 = 0;
             break;
         case 2:
-            GPIO_D3 = 0;
+            PWMA_SetPinOutputState(PWM_Pin_3N, HAL_State_ON);
+            //GPIO_D3 = 0;
             break;
     }
 
@@ -240,5 +248,54 @@ void lcd_init(void)
     EXTI_Timer1_SetIntState(HAL_State_ON);
     EXTI_Timer1_SetIntPriority(EXTI_IntPriority_High);
     TIM_Timer1_SetRunState(HAL_State_ON);
+
+    /* Configure PWM on digit pins */
+
+    PWMA_PWM3_SetPortState(HAL_State_OFF);
+    PWMA_PWM3N_SetPortState(HAL_State_OFF);
+    PWMA_PWM4_SetPortState(HAL_State_OFF);
+    
+    PWMA_PWM3_SetPortDirection(PWMB_PortDirOut);
+    PWMA_PWM4_SetPortDirection(PWMB_PortDirOut);
+    
+    PWMA_PWM3_ConfigOutputMode(PWM_OutputMode_PWM_LowIfLess);
+    PWMA_PWM4_ConfigOutputMode(PWM_OutputMode_PWM_LowIfLess);
+    
+    PWMA_PWM3_SetComparePreload(HAL_State_ON);
+    PWMA_PWM4_SetComparePreload(HAL_State_ON);
+    
+    PWMA_PWM3_SetPortState(HAL_State_ON);
+    PWMA_PWM3N_SetPortState(HAL_State_ON);
+    PWMA_PWM4_SetPortState(HAL_State_ON);
+
+    PWMA_SetPrescaler(11); // 1Mhz
+    PWMA_SetPeriod(0);
+    PWMA_SetCounterDirection(PWM_CounterDirection_Down);
+    PWMA_SetAutoReloadPreload(HAL_State_ON);
+    PWMA_SetPinOutputState(PWM_Pin_3 | PWM_Pin_3N | PWM_Pin_4, HAL_State_OFF);
+
+    PWMA_PWM3_SetPort(PWMA_PWM3_AlterPort_P14_P15);
+    PWMA_PWM4_SetPort(PWMA_PWM4_AlterPort_P16_P17);
+    
+    PWMA_SetOverallState(HAL_State_ON);
+    PWMA_SetCounterState(HAL_State_ON);
 }
 
+uint8_t lcd_get_brightness(void)
+{
+    uint8_t val;
+    
+    SFRX_ON();
+    val = PWMA_ARRL;
+    SFRX_OFF();
+
+    return val;
+}
+
+void lcd_set_brightness(uint8_t val)
+{
+    if (val < MIN_BRIGHTNESS)
+    {
+        PWMA_SetPeriod((uint16_t)val);
+    } 
+}

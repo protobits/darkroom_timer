@@ -207,6 +207,12 @@ void statemachine_enter(State state)
       lcd_draw_milliseconds(compute_next_strip_time());
       break;
 
+    case STATE_SET_MENU:
+      lcd_draw_text("set");
+      break;
+    case STATE_SET_BRIGHTNESS_MENU:
+      lcd_draw_text("brt");
+      break;
   }
 
   current_state_delayed = current_state = state;
@@ -352,6 +358,11 @@ void statemachine_process(void)
 
       statemachine_enter_onbutton(BUTTON_OK, STATE_STRIP_BASE);
 
+      /* advance to set menu */
+      
+      statemachine_enter_onbutton(BUTTON_PLUS, STATE_SET_MENU);
+      statemachine_enter_onbutton(BUTTON_MINUS, STATE_SET_MENU);
+
       break;
 
     case STATE_STRIP_BASE:
@@ -486,6 +497,26 @@ void statemachine_process(void)
       statemachine_enter_onbutton(BUTTON_TRIGGER, STATE_STRIP_COUNTDOWN);
 
       statemachine_enter_onbutton(BUTTON_CANCEL, STATE_STRIP_BASE);
+      break;
+
+    case STATE_SET_MENU:      
+      statemachine_enter_onbutton(BUTTON_OK, STATE_SET_BRIGHTNESS_MENU);
+      statemachine_enter_onbutton(BUTTON_CANCEL, STATE_TIMER_READY);
+      break;
+
+    case STATE_SET_BRIGHTNESS_MENU:
+      if ((button_states & BUTTON_PLUS) && (changed_buttons & BUTTON_PLUS))
+      {
+        lcd_set_brightness(lcd_get_brightness() - 1);
+      }
+      else if ((button_states & BUTTON_MINUS) && (changed_buttons & BUTTON_MINUS))
+      {
+        lcd_set_brightness(lcd_get_brightness() + 1);
+      }
+
+      statemachine_enter_onbutton(BUTTON_OK, STATE_TIMER_READY);
+      statemachine_enter_onbutton(BUTTON_CANCEL, STATE_SET_MENU);
+      
       break;
   }
 }
