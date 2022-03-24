@@ -1,0 +1,27 @@
+{
+  "files.associations": {
+    "fw_hal.h": "c",
+    "fw_conf.h": "c",
+    "fw_reg_stc8h.h": "c",
+    "fw_reg_base.h": "c",
+    "fw_sys.h": "c",
+    "fw_tim.h": "c",
+    "compiler.h": "c",
+    "stddef.h": "c",
+    "stdc-predef.h": "c",
+    "stdint.h": "c",
+    "stdint-gcc.h": "c",
+    "stdbool.h": "c",
+    "gpio.h": "c",
+    "fw_types.h": "c",
+    "input.h": "c",
+    "statemachine.h": "c",
+    "alarm.h": "c",
+    "fixedmath.h": "c",
+    "stdio.h": "c"
+  },
+  "search.exclude": {
+    "build/**": true,
+  },
+  "cmake.configureOnOpen": true,
+}
