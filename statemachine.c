@@ -7,6 +7,7 @@
 #include "alarm.h"
 #include "relay.h"
 #include "fixedmath.h"
+#include "settings.h"
 
 #define RAPID_INCREASE_PERIOD 100
 
@@ -143,20 +144,8 @@ void statemachine_enter(State state)
       lcd_draw_milliseconds(countdown_base);
       break;
     case STATE_TIMER_COUNTDOWN:
-      if (current_state == STATE_TIMER_PAUSED)
-      {
-        alarm_pause(false);
-      }
-      else
-      {
-        statemachine_enter_delayed(countdown_base, STATE_TIMER_READY);
-      }
-      
+      statemachine_enter_delayed(countdown_base, STATE_TIMER_READY);
       relay_set(true);
-      break;
-    case STATE_TIMER_PAUSED:
-      alarm_pause(true);
-      relay_set(false);
       break;
     case STATE_TIMER_TIME_MODE_MENU:
     {
@@ -319,32 +308,13 @@ void statemachine_process(void)
     {
       lcd_draw_milliseconds(alarm_get_remaining());
 
-      #if 0
-      if ((changed_buttons & BUTTON_TRIGGER) && (button_states & BUTTON_TRIGGER))
-      {
-        statemachine_enter(STATE_TIMER_PAUSED);
-      }
-      #endif
       if ((changed_buttons & BUTTON_CANCEL) && (button_states & BUTTON_CANCEL))
       {
         statemachine_enter(STATE_TIMER_READY);
       }
       break;
     }
-    #if 0
-    case STATE_TIMER_PAUSED:
-      if ((changed_buttons & BUTTON_TRIGGER) && (button_states & BUTTON_TRIGGER))
-      {
-        statemachine_enter(STATE_TIMER_COUNTDOWN);
-      }
 
-      if ((changed_buttons & BUTTON_CANCEL) && (button_states & BUTTON_CANCEL))
-      {
-        statemachine_enter(STATE_TIMER_READY);
-      }
-
-      break;
-    #endif
     case STATE_FOCUS:
       statemachine_enter_onbutton(BUTTON_CANCEL, STATE_TIMER_READY);
       break;
@@ -513,8 +483,15 @@ void statemachine_process(void)
       {
         lcd_set_brightness(lcd_get_brightness() + 1);
       }
+      else if ((button_states & BUTTON_OK) && (changed_buttons & BUTTON_OK))
+      {
+        #if 0
+        get_settings()->brightness = lcd_get_brightness();
+        save_settings();
+        #endif
+        statemachine_enter(STATE_TIMER_READY);
+      }
 
-      statemachine_enter_onbutton(BUTTON_OK, STATE_TIMER_READY);
       statemachine_enter_onbutton(BUTTON_CANCEL, STATE_SET_MENU);
       
       break;

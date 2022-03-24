@@ -127,15 +127,12 @@ void lcd_render(void)
     {
         case 0:
             PWMA_SetPinOutputState(PWM_Pin_4, HAL_State_ON);
-            //GPIO_D1 = 0;
             break;
         case 1:
             PWMA_SetPinOutputState(PWM_Pin_3, HAL_State_ON);
-            //GPIO_D2 = 0;
             break;
         case 2:
             PWMA_SetPinOutputState(PWM_Pin_3N, HAL_State_ON);
-            //GPIO_D3 = 0;
             break;
     }
 
@@ -269,7 +266,7 @@ void lcd_init(void)
     PWMA_PWM4_SetPortState(HAL_State_ON);
 
     PWMA_SetPrescaler(11); // 1Mhz
-    PWMA_SetPeriod(0);
+    PWMA_SetPeriod(0xF);
     PWMA_SetCounterDirection(PWM_CounterDirection_Down);
     PWMA_SetAutoReloadPreload(HAL_State_ON);
     PWMA_SetPinOutputState(PWM_Pin_3 | PWM_Pin_3N | PWM_Pin_4, HAL_State_OFF);

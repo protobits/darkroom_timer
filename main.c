@@ -6,6 +6,7 @@
 #include "lcd.h"
 #include "input.h"
 #include "statemachine.h"
+#include "settings.h"
 
 INTERRUPT(UART1_Routine, EXTI_VectUART1)
 {
@@ -63,6 +64,13 @@ void main(void)
     /* Activate interrupts */
 
     EXTI_Global_SetIntState(HAL_State_ON);
+
+    #if 0
+    /* load settings */
+
+    load_settings();
+    lcd_set_brightness(get_settings()->brightness);
+    #endif
 
     /* main loop */
 

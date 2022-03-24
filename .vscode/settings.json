@@ -18,7 +18,8 @@
     "statemachine.h": "c",
     "alarm.h": "c",
     "fixedmath.h": "c",
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "settings.h": "c"
   },
   "search.exclude": {
     "build/**": true,
